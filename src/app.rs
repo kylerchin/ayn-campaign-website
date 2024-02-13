@@ -11,8 +11,7 @@ pub fn App() -> impl IntoView {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/kylerchinmusic.css"/>
-        
-        <Title text="Kyler Chin - Singer & Producer"/>
+        <Stylesheet href="https://use.typekit.net/ffc3xaq.css"/>
 
         // content for this welcome page
         <Router>
@@ -32,7 +31,6 @@ pub fn App() -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     // Creates a reactive value to update the button
-
     leptos_meta::provide_meta_context();
 
     provide_i18n_context();
@@ -40,15 +38,29 @@ fn HomePage() -> impl IntoView {
     let i18n = use_i18n();
 
     view! {
-        // sets the document title
-        <h1>"Kyler Chin"</h1>
         
-        <div>
+        <Title text="Kyler Chin - Singer & Producer"/>
+        // sets the document title
+        <div 
+        class=" gaze1 bg-no-repeat bg-cover bg-right md:bg-center" class="py-96 2xl:py-[40em]"
+        >
+        
+        <div class="w-full">
+        <div class="container mx-auto">
+            <h1 class="text-black amster text-4xl font-bold">"Kyler Chin"</h1>
+        </div>
+        </div>
+        </div>
+        
+        <div class="w-full">
         //info box
+        <div class="container mx-auto pt-10 ">
+        <h2 class="text-3xl font-semibold amster">"Profile"</h2>
         <p><span class="font-bold">{t!(i18n, blood_type)}</span>" "<span>"AB+"</span></p>
         <p><span class="font-bold">{t!(i18n, height)}</span>" "<span>"173 cm"</span></p>
-        <p><span class="font-bold">{t!(i18n, weight)}</span>" "<span>"59 kg"</span></p>
+        <p><span class="font-bold">{t!(i18n, weight)}</span>" "<span>"60 kg"</span></p>
         <p><span class="font-bold">{t!(i18n, birthday)}</span>" "<span>{t!(i18n,kylers_birthday)}</span></p>
+        </div>
         </div>
     }
 }
