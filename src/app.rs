@@ -8,6 +8,15 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
 
     view! {
+       // <!-- Google tag (gtag.js) -->
+<Script async_="true" src="https://www.googletagmanager.com/gtag/js?id=G-NJ3G60BR1Z"/>
+<Script>
+"window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-NJ3G60BR1Z');"
+</Script>
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/kylerchinmusic.css"/>
@@ -137,7 +146,7 @@ fn HomePage() -> impl IntoView {
         //info box
         <div class="container mx-auto pt-10 ">
         <div class="mx-4 md:mx-12 lg:mx-24">
-        <h2 class="text-3xl font-semibold amster">"Profile"</h2>
+        <h2 class="text-3xl font-semibold amster">{t!(i18n,profile)}</h2>
         <p><span class="font-bold">{t!(i18n, blood_type)}</span>" "<span>"AB+"</span></p>
         <p><span class="font-bold">{t!(i18n, height)}</span>" "<span>"173 cm"</span></p>
         <p><span class="font-bold">{t!(i18n, weight)}</span>" "<span>"59 kg"</span></p>
