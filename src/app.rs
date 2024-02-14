@@ -22,7 +22,7 @@ gtag('config', 'G-NJ3G60BR1Z');"
             <Stylesheet id="leptos" href="/pkg/kylerchinmusic.css"/>
             <Stylesheet href="https://use.typekit.net/ffc3xaq.css"/>
 
-            <Script>
+            <Script async_="true">
             "
         (function(d) {
           var config = {
