@@ -115,7 +115,7 @@ fn HomePage() -> impl IntoView {
         <Title text={t!(i18n, title)}/>
         // sets the document title
         <div 
-        class=" gaze1 bg-no-repeat bg-cover bg-[center_right_-15rem] sm:bg-[center_right_-5rem] md:bg-center" class=""
+        class=" gaze1 bg-no-repeat bg-cover bg-[center_right_-15rem] sm:bg-[center_right_-5rem] md:bg-center" 
         >
         
         <div class="w-full">
