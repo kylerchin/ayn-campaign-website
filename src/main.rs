@@ -117,7 +117,10 @@ async fn ads(
 
 #[cfg(feature = "ssr")]
 #[actix_web::get("ntpns")]
-async fn ntpns(req: actix_web::HttpRequest, leptos_options: actix_web::web::Data<leptos::LeptosOptions>) -> impl actix_web::Responder {
+async fn ntpns(
+    req: actix_web::HttpRequest,
+    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
+) -> impl actix_web::Responder {
     let qs = qstring::QString::from(req.query_string());
     match qs.get("c") {
         Some(c) => match c.parse::<u128>() {
@@ -134,7 +137,7 @@ async fn ntpns(req: actix_web::HttpRequest, leptos_options: actix_web::web::Data
                     .insert_header(("Access-Control-Allow-Origin", "*"))
                     .body(format!(
                         "{}|{}",
-                        server_timestamp_ns,server_client_req_diff_time
+                        server_timestamp_ns, server_client_req_diff_time
                     ))
             }
             Err(err) => actix_web::HttpResponse::BadRequest()
