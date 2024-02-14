@@ -42,12 +42,14 @@ fn HomePage() -> impl IntoView {
         <Title text="Kyler Chin - Singer & Producer"/>
         // sets the document title
         <div 
-        class=" gaze1 bg-no-repeat bg-cover bg-right md:bg-center" class="py-96 2xl:py-[40em]"
+        class=" gaze1 bg-no-repeat bg-cover bg-right md:bg-center" class="py-96 min-[2000px]:py-[40em]"
         >
         
         <div class="w-full">
         <div class="container mx-auto">
-            <h1 class="text-black amster text-4xl font-bold">"Kyler Chin"</h1>
+            <div class="md:mx-12 lg:mx-24">
+            <h1 class="text-white amster text-4xl font-bold">"Kyler Chin"</h1>
+            </div>
         </div>
         </div>
         </div>
@@ -55,11 +57,14 @@ fn HomePage() -> impl IntoView {
         <div class="w-full">
         //info box
         <div class="container mx-auto pt-10 ">
+        <div class="md:mx-12 lg:mx-24">
         <h2 class="text-3xl font-semibold amster">"Profile"</h2>
         <p><span class="font-bold">{t!(i18n, blood_type)}</span>" "<span>"AB+"</span></p>
         <p><span class="font-bold">{t!(i18n, height)}</span>" "<span>"173 cm"</span></p>
         <p><span class="font-bold">{t!(i18n, weight)}</span>" "<span>"60 kg"</span></p>
         <p><span class="font-bold">{t!(i18n, birthday)}</span>" "<span>{t!(i18n,kylers_birthday)}</span></p>
+        </div>
+
         </div>
         </div>
     }
