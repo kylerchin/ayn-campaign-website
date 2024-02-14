@@ -156,6 +156,7 @@ fn HomePage() -> impl IntoView {
         
         <h2 class="text-3xl font-semibold amster">{t!(i18n, discography)}</h2>
         <p>{t!(i18n, comingsoon)}</p>
+        <p>{t!(i18n, email)} ": kyler@yk3music.com"</p>
         </div>
         <br/>
         <br/>
