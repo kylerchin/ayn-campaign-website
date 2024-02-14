@@ -88,6 +88,12 @@ fn TransparentNav() -> impl IntoView {
 
 #[component]
 fn Footer() -> impl IntoView {
+    leptos_meta::provide_meta_context();
+
+    provide_i18n_context();
+
+    let i18n = use_i18n();
+
     view! {
         <div class="w-full  bg-[#101010] text-white px-8 py-4 text-sm  mt-auto">
         
