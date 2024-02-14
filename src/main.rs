@@ -1,11 +1,19 @@
 #[cfg(feature = "ssr")]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    use actix_web::dev::Service;
+    use actix_web::http::Uri;
     use actix_files::Files;
     use actix_web::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use kylerchinmusic::app::*;
+
+    use core::future::Future;
+        use futures::FutureExt;
+        use futures::future::Either;
+        use futures::future::Ready;
+        use futures::future::ok;
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -24,9 +32,54 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("/assets", site_root))
             // serve the favicon from /favicon.ico
             .service(favicon)
+            .wrap_fn(|service_request, service| {
+                let uri_original = service_request.uri().clone();
+
+                let mut uri_new = Uri::builder().scheme("https").authority("kylerchin.com");
+                
+                if let Some(p_and_q) = uri_original.path_and_query() {
+                    uri_new = uri_new.path_and_query(p_and_q.as_str());
+                }
+
+                let uri = format!("{}", uri_new.build().unwrap());
+
+                service.call(service_request).map(move |result| {
+
+                    let languages = vec!["en","ko"];
+
+                    let language_final_header = languages.iter().map(|lang_code| format!(
+                        "<{}>; rel=\"alternate\"; hreflang=\"{}\"", uri, lang_code.clone()
+                    ))
+                    .collect::<Vec<String>>()
+                    .join(",");
+
+                    let mut service_response = result.unwrap();
+
+                    let header_value = http::header::HeaderValue::from_str(
+                        &language_final_header
+                    );
+
+                    match header_value {
+                        Ok(header_value) => {
+                        service_response
+                        .headers_mut()
+                        .insert(
+                            http::header::HeaderName::from_static("link"),
+                            header_value
+                        );
+                        },
+                        Err(err) => {
+                            println!("{:#?}", err);
+                        }
+                    }
+
+                    
+                    Ok(service_response)
+                })
+            })
             .leptos_routes(leptos_options.to_owned(), routes.to_owned(), App)
             .app_data(web::Data::new(leptos_options.to_owned()))
-        //.wrap(middleware::Compress::default())
+        .wrap(middleware::Compress::default())
     })
     .bind(&addr)?
     .run()

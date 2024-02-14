@@ -1374,6 +1374,7 @@ dependencies = [
  "actix-web",
  "console_error_panic_hook",
  "fluent-templates",
+ "futures",
  "http 1.0.0",
  "leptos",
  "leptos-fluent",

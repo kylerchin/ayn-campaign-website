@@ -5,7 +5,9 @@ module.exports = {
     },
     darkMode: "class",
     theme: {
-        extend: {},
+        extend: {
+            "sans": ["ibm-plex-sans-kr","proxima-nova"]
+        },
     },
     plugins: [],
 }

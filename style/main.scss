@@ -11,3 +11,27 @@
 }
 
 .amster {font-family: "amster", serif;}
+
+
+@keyframes topFadeIn {
+    0% {
+      position: relative;
+      top: -15px;
+      opacity: 0;
+    }
+  
+    100% {
+      position: relative;
+      top: 0px;
+      opacity: 1;
+    }
+  }
+  
+  .fadeintop {
+    animation-name: topFadeIn;
+    animation-duration: 2s;
+  }
+
+  body {
+    height: 100vh;
+  }
