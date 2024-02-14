@@ -93,7 +93,9 @@ fn Footer() -> impl IntoView {
         
        
        <div class="container mx-full"> <p class="underline"><a href="https://computing.kylerchin.com">"Computing"</a></p>
+       <p>{t!(i18n, email)} ": kyler@yk3music.com"</p>
        <br/>
+    
        <p>"© Yk3 Music 2024"</p></div>
     </div>
     }
@@ -156,7 +158,6 @@ fn HomePage() -> impl IntoView {
         
         <h2 class="text-3xl font-semibold amster">{t!(i18n, discography)}</h2>
         <p>{t!(i18n, comingsoon)}</p>
-        <p>{t!(i18n, email)} ": kyler@yk3music.com"</p>
         </div>
         <br/>
         <br/>
