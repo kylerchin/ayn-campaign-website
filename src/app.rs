@@ -128,7 +128,7 @@ fn HomePage() -> impl IntoView {
         white_text={true}
         />
         </div>
-        <div class="container mx-auto py-48 md:py-96 min-[20000px]:py-[40em]">
+        <div class="container mx-auto py-48 md:py-96 min-[2000px]:py-[40em]">
             <div class="mx-6 fadeintop md:mx-12 lg:mx-24">
             <h1 class="text-white drop-shadow amster text-3xl md:text-4xl font-bold">"Kyler Chin"</h1>
             <p class="text-white drop-shadow">{t!(i18n, shorttitle)}</p>
