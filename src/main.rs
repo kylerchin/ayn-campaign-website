@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
                             format!(
                                 "<{}>; rel=\"alternate\"; hreflang=\"{}\"",
                                 uri,
-                                lang_code.clone()
+                                lang_code
                             )
                         })
                         .collect::<Vec<String>>()
