@@ -49,7 +49,7 @@ async fn main() -> std::io::Result<()> {
                 let uri = format!("{}", uri_new.build().unwrap());
 
                 service.call(service_request).map(move |result| {
-                    let languages = vec!["en", "ko", "zh"];
+                    let languages = vec!["en", "ko", "zh", "zh-TW"];
 
                     let language_final_header = languages
                         .iter()
