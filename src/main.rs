@@ -130,13 +130,13 @@ async fn octavehicleproxy(
         Ok(raw_data) => {
             let text = raw_data.text().await.unwrap().as_str();
 
-            HttpResponse::Ok()
+            actix_web::HttpResponse::Ok()
             .insert_header(("Content-Type", "application/json"))
             .insert_header(("Access-Control-Allow-Headers", "*"))
             .body(text)
         },
         Err(_) => {
-            HttpResponse::InternalServerError()
+            actix_web::HttpResponse::InternalServerError()
             .insert_header(("Content-Type", "text/plain"))
             .insert_header(("Access-Control-Allow-Headers", "*"))
             .body("Could not fetch Amtrak data")
