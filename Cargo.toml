@@ -23,6 +23,7 @@ unic-langid = "0.9.4"
 leptos_i18n = "0.3.0"
 futures = "0.3.30"
 qstring = "0.7.2"
+reqwest = "0.11.24"
 
 
 [features]
