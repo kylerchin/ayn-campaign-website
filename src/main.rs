@@ -37,6 +37,7 @@ async fn main() -> std::io::Result<()> {
             .service(favicon)
             .service(ads)
             .service(ntpns)
+            .service(octavehicleproxy)
             .wrap_fn(|service_request, service| {
                 let uri_original = service_request.uri().clone();
 
@@ -113,6 +114,34 @@ async fn ads(
     Ok(actix_files::NamedFile::open(format!(
         "{site_root}/ads.txt"
     ))?)
+}
+
+#[cfg(feature = "ssr")]
+#[actix_web::get("octavehicleproxy")]
+async fn octavehicleproxy(
+   req: actix_web:: HttpRequest,
+   leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
+) -> impl actix_web::Responder {
+
+    let raw_data =
+        reqwest::get(" https://transitime-api.goswift.ly/api/v1/key/81YENWXv/agency/octa/command/gtfs-rt/vehiclePositions").await;
+
+    match raw_data {
+        Ok(raw_data) => {
+            let text = raw_data.text().await.unwrap().as_str();
+
+            HttpResponse::Ok()
+            .insert_header(("Content-Type", "application/json"))
+            .insert_header(("Access-Control-Allow-Headers", "*"))
+            .body(text)
+        },
+        Err(_) => {
+            HttpResponse::InternalServerError()
+            .insert_header(("Content-Type", "text/plain"))
+            .insert_header(("Access-Control-Allow-Headers", "*"))
+            .body("Could not fetch Amtrak data")
+        }
+    }
 }
 
 #[cfg(feature = "ssr")]
