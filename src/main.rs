@@ -128,7 +128,7 @@ async fn octavehicleproxy(
 
     match raw_data {
         Ok(raw_data) => {
-            let text = raw_data.text().await.unwrap().as_str();
+            let text = raw_data.text().await.unwrap();
 
             actix_web::HttpResponse::Ok()
             .insert_header(("Content-Type", "application/json"))
