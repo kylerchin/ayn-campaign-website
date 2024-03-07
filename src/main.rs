@@ -141,7 +141,9 @@ async fn octavehicleproxy(
                     if clienthash.is_ok() {
                         let clienthash = clienthash.unwrap();
                         if clienthash == hashofresult {
-                            return actix_web::HttpResponse::NoContent().body("");
+                            return actix_web::HttpResponse::NoContent()
+                            .insert_header(("Access-Control-Allow-Origin", "*"))
+                            .body("");
                         }
                     }
             }
