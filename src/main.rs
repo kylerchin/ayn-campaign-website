@@ -6,6 +6,7 @@ async fn main() -> std::io::Result<()> {
     use actix_web::http::Uri;
     use actix_web::HttpResponse;
     use actix_web::Responder;
+    use rand::Rng;
     use actix_web::*;
     use kylerchinmusic::app::*;
     use leptos::*;
@@ -128,10 +129,26 @@ async fn octavehicleproxy(
 
     match raw_data {
         Ok(raw_data) => {
-            let text = raw_data.text().await.unwrap();
+            let text = raw_data.bytes().await.unwrap();
+
+            let hashofresult = fasthash::metro::hash64(&text);
+
+            let qs = qstring::QString::from(req.query_string());
+
+            let hashofbodyclient = qs.get("bodyhash");
+            if let Some(hashofbodyclient) = hashofbodyclient {
+                    let clienthash = hashofbodyclient.parse::<u64>();
+                    if clienthash.is_ok() {
+                        let clienthash = clienthash.unwrap();
+                        if clienthash == hashofresult {
+                            return actix_web::HttpResponse::NoContent().body("");
+                        }
+                    }
+            }
 
             actix_web::HttpResponse::Ok()
             .insert_header(("Access-Control-Allow-Origin", "*"))
+            .insert_header(("hash", hashofresult))
             .body(text)
         },
         Err(_) => {
