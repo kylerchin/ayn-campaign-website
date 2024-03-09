@@ -125,7 +125,7 @@ async fn octavehicleproxy(
 ) -> impl actix_web::Responder {
 
     let raw_data =
-        reqwest::get("https://transitime-api.goswift.ly/api/v1/key/81YENWXv/agency/octa/command/gtfs-rt/vehiclePositions").await;
+        reqwest::get("https://api.octa.net/GTFSRealTime/protoBuf/VehiclePositions.aspx").await;
 
     match raw_data {
         Ok(raw_data) => {
