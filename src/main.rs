@@ -96,7 +96,14 @@ async fn main() -> std::io::Result<()> {
 
 #[cfg(feature = "ssr")]
 #[actix_web::get("/loom_proxy_freiburg/{tileset}/{z}/{x}/{y}")]
-async fn loom_proxy_freiburg(tileset: String, z: i32, x:i32, y:i32, leptos_options: actix_web::web::Data<leptos::LeptosOptions>) {
+async fn loom_proxy_freiburg(path: actix_web::web::Path<(String, i32, i32, i32)>, leptos_options: actix_web::web::Data<leptos::LeptosOptions>) -> impl actix_web::Responder {
+    let path_inner = path.into_inner();
+    
+    let tileset = path_inner.0;
+    let z = path_inner.1;
+    let x = path_inner.2;
+    let y = path_inner.3;
+
     let url = format!("https://loom.cs.uni-freiburg.de/tiles/{}/geo/{}/{}/{}.mvt", tileset, z,x,y);
 
     let client = reqwest::Client::new();
@@ -105,14 +112,14 @@ async fn loom_proxy_freiburg(tileset: String, z: i32, x:i32, y:i32, leptos_optio
 
     match resp {
         Ok(resp) => {
+            //let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
             let body = resp.bytes().await.unwrap();
-            let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
-            HttpResponse::Ok()
-                .content_type(content_type)
+            actix_web::HttpResponse::Ok()
+               // .content_type(content_type)
                 .body(body)
         },
         Err(_) => {
-            HttpResponse::InternalServerError()
+            actix_web::HttpResponse::InternalServerError()
                 .insert_header(("Content-Type", "text/plain"))
                 .body("Could not fetch Freiburg data")
         }
