@@ -110,6 +110,7 @@ async fn loom_proxy_freiburg_info(
         ],\"bounds\":[-175,-85,175,80],\"description\":\"tileset\",\"name\":\"loom\"}}", tileset);
 
     actix_web::HttpResponse::Ok()
+    .insert_header(("Access-Control-Allow-Origin", "*"))
         .insert_header(("Content-Type", "text/plain"))
         .body(response_text)
 }
@@ -142,6 +143,8 @@ async fn loom_proxy_freiburg(
             let body = resp.bytes().await.unwrap();
             actix_web::HttpResponse::Ok()
                 // .content_type(content_type)
+                
+    .insert_header(("Access-Control-Allow-Origin", "*"))
                 .body(body)
         }
         Err(_) => actix_web::HttpResponse::InternalServerError()
