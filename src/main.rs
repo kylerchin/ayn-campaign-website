@@ -99,7 +99,7 @@ async fn loom_proxy_freiburg_info(
 ) -> impl actix_web::Responder {
     let path_inner = path.into_inner();
 
-    let tileset = path_inner.0;
+    let tileset = path_inner;
 
     let response_text = format!("{{\"tilejson\":\"3.0.0\",\"tiles\":[\"https://kylerchin.com/loom_proxy_freiburg/{},{{z}}/{{x}}/{{y}}\"],\"vector_layers\":[
         {{
