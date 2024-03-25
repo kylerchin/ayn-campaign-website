@@ -6,12 +6,12 @@ async fn main() -> std::io::Result<()> {
     use actix_web::http::Uri;
     use actix_web::HttpResponse;
     use actix_web::Responder;
-    use rand::Rng;
     use actix_web::*;
     use kylerchinmusic::app::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use qstring::QString;
+    use rand::Rng;
 
     use core::future::Future;
     use futures::future::ok;
@@ -39,6 +39,7 @@ async fn main() -> std::io::Result<()> {
             .service(ads)
             .service(ntpns)
             .service(octavehicleproxy)
+            .service(loom_proxy_freiburg_info)
             .service(loom_proxy_freiburg)
             .wrap_fn(|service_request, service| {
                 let uri_original = service_request.uri().clone();
@@ -57,11 +58,7 @@ async fn main() -> std::io::Result<()> {
                     let language_final_header = languages
                         .iter()
                         .map(|lang_code| {
-                            format!(
-                                "<{}>; rel=\"alternate\"; hreflang=\"{}\"",
-                                uri,
-                                lang_code
-                            )
+                            format!("<{}>; rel=\"alternate\"; hreflang=\"{}\"", uri, lang_code)
                         })
                         .collect::<Vec<String>>()
                         .join(",");
@@ -95,16 +92,45 @@ async fn main() -> std::io::Result<()> {
 }
 
 #[cfg(feature = "ssr")]
-#[actix_web::get("/loom_proxy_freiburg/{tileset}/{z}/{x}/{y}")]
-async fn loom_proxy_freiburg(path: actix_web::web::Path<(String, i32, i32, i32)>, leptos_options: actix_web::web::Data<leptos::LeptosOptions>) -> impl actix_web::Responder {
+#[actix_web::get("/loom_proxy_freiburg/{tileset}/")]
+async fn loom_proxy_freiburg_info(
+    path: actix_web::web::Path<(String)>,
+    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
+) -> impl actix_web::Responder {
     let path_inner = path.into_inner();
-    
+
+    let tileset = path_inner.0;
+
+    let response_text = format!("{{\"tilejson\":\"3.0.0\",\"tiles\":[\"https://kylerchin.com/loom_proxy_freiburg/{},{{z}}/{{x}}/{{y}}\"],\"vector_layers\":[
+        {{
+        \"id\": \"lines\",
+        \"fields\":
+        {{\"color\":\"text\"}}
+        }}
+        ],\"bounds\":[-175,-85,175,80],\"description\":\"tileset\",\"name\":\"loom\"}}", tileset);
+
+    actix_web::HttpResponse::Ok()
+        .insert_header(("Content-Type", "text/plain"))
+        .body(response_text)
+}
+
+#[cfg(feature = "ssr")]
+#[actix_web::get("/loom_proxy_freiburg/{tileset}/{z}/{x}/{y}")]
+async fn loom_proxy_freiburg(
+    path: actix_web::web::Path<(String, i32, i32, i32)>,
+    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
+) -> impl actix_web::Responder {
+    let path_inner = path.into_inner();
+
     let tileset = path_inner.0;
     let z = path_inner.1;
     let x = path_inner.2;
     let y = path_inner.3;
 
-    let url = format!("https://loom.cs.uni-freiburg.de/tiles/{}/geo/{}/{}/{}.mvt", tileset, z,x,y);
+    let url = format!(
+        "https://loom.cs.uni-freiburg.de/tiles/{}/geo/{}/{}/{}.mvt",
+        tileset, z, x, y
+    );
 
     let client = reqwest::Client::new();
 
@@ -115,16 +141,13 @@ async fn loom_proxy_freiburg(path: actix_web::web::Path<(String, i32, i32, i32)>
             //let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
             let body = resp.bytes().await.unwrap();
             actix_web::HttpResponse::Ok()
-               // .content_type(content_type)
+                // .content_type(content_type)
                 .body(body)
-        },
-        Err(_) => {
-            actix_web::HttpResponse::InternalServerError()
-                .insert_header(("Content-Type", "text/plain"))
-                .body("Could not fetch Freiburg data")
         }
+        Err(_) => actix_web::HttpResponse::InternalServerError()
+            .insert_header(("Content-Type", "text/plain"))
+            .body("Could not fetch Freiburg data"),
     }
-
 }
 
 #[cfg(feature = "ssr")]
@@ -154,10 +177,9 @@ async fn ads(
 #[cfg(feature = "ssr")]
 #[actix_web::get("octavehicleproxy")]
 async fn octavehicleproxy(
-   req: actix_web:: HttpRequest,
-   leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
+    req: actix_web::HttpRequest,
+    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
 ) -> impl actix_web::Responder {
-
     let raw_data =
         reqwest::get("https://api.octa.net/GTFSRealTime/protoBuf/VehiclePositions.aspx").await;
 
@@ -171,28 +193,26 @@ async fn octavehicleproxy(
 
             let hashofbodyclient = qs.get("bodyhash");
             if let Some(hashofbodyclient) = hashofbodyclient {
-                    let clienthash = hashofbodyclient.parse::<u64>();
-                    if clienthash.is_ok() {
-                        let clienthash = clienthash.unwrap();
-                        if clienthash == hashofresult {
-                            return actix_web::HttpResponse::NoContent()
+                let clienthash = hashofbodyclient.parse::<u64>();
+                if clienthash.is_ok() {
+                    let clienthash = clienthash.unwrap();
+                    if clienthash == hashofresult {
+                        return actix_web::HttpResponse::NoContent()
                             .insert_header(("Access-Control-Allow-Origin", "*"))
                             .body("");
-                        }
                     }
+                }
             }
 
             actix_web::HttpResponse::Ok()
-            .insert_header(("Access-Control-Allow-Origin", "*"))
-            .insert_header(("hash", hashofresult))
-            .body(text)
-        },
-        Err(_) => {
-            actix_web::HttpResponse::InternalServerError()
+                .insert_header(("Access-Control-Allow-Origin", "*"))
+                .insert_header(("hash", hashofresult))
+                .body(text)
+        }
+        Err(_) => actix_web::HttpResponse::InternalServerError()
             .insert_header(("Content-Type", "text/plain"))
             .insert_header(("Access-Control-Allow-Origin", "*"))
-            .body("Could not fetch Amtrak data")
-        }
+            .body("Could not fetch Amtrak data"),
     }
 }
 

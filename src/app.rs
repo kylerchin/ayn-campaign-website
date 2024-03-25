@@ -192,7 +192,12 @@ fn PickTranslation(set_opened: WriteSignal<bool>) -> impl IntoView {
 
     leptos_i18n::load_locales!();
 
-    let avaliable_lang = vec![(Locale::en, "English"), (Locale::zh, "简体中文"), (Locale::zh_TW, "繁體中文"), (Locale::ko, "한국어")];
+    let avaliable_lang = vec![
+        (Locale::en, "English"),
+        (Locale::zh, "简体中文"),
+        (Locale::zh_TW, "繁體中文"),
+        (Locale::ko, "한국어"),
+    ];
 
     view! {
         {
