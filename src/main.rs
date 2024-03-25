@@ -101,7 +101,7 @@ async fn loom_proxy_freiburg_info(
 
     let tileset = path_inner;
 
-    let response_text = format!("{{\"tilejson\":\"3.0.0\",\"tiles\":[\"https://kylerchin.com/loom_proxy_freiburg/{},{{z}}/{{x}}/{{y}}\"],\"vector_layers\":[
+    let response_text = format!("{{\"tilejson\":\"3.0.0\",\"tiles\":[\"https://kylerchin.com/loom_proxy_freiburg/{}/{{z}}/{{x}}/{{y}}\"],\"vector_layers\":[
         {{
         \"id\": \"lines\",
         \"fields\":
