@@ -39,6 +39,7 @@ async fn main() -> std::io::Result<()> {
             .service(ads)
             .service(ntpns)
             .service(octavehicleproxy)
+            .service(loom_proxy_freiburg)
             .wrap_fn(|service_request, service| {
                 let uri_original = service_request.uri().clone();
 
@@ -91,6 +92,32 @@ async fn main() -> std::io::Result<()> {
     .bind(&addr)?
     .run()
     .await
+}
+
+#[cfg(feature = "ssr")]
+#[actix_web::get("/loom_proxy_freiburg/{tileset}/{z}/{x}/{y}")]
+async fn loom_proxy_freiburg(tileset: String, z: i32, x:i32, y:i32, leptos_options: actix_web::web::Data<leptos::LeptosOptions>) {
+    let url = format!("https://loom.cs.uni-freiburg.de/tiles/{}/geo/{}/{}/{}.mvt", tileset, z,x,y);
+
+    let client = reqwest::Client::new();
+
+    let resp = client.get(&url).send().await;
+
+    match resp {
+        Ok(resp) => {
+            let body = resp.bytes().await.unwrap();
+            let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
+            HttpResponse::Ok()
+                .content_type(content_type)
+                .body(body)
+        },
+        Err(_) => {
+            HttpResponse::InternalServerError()
+                .insert_header(("Content-Type", "text/plain"))
+                .body("Could not fetch Freiburg data")
+        }
+    }
+
 }
 
 #[cfg(feature = "ssr")]
