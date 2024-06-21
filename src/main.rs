@@ -7,7 +7,7 @@ async fn main() -> std::io::Result<()> {
     use actix_web::HttpResponse;
     use actix_web::Responder;
     use actix_web::*;
-    use kylerchinmusic::app::*;
+    use ayncampaign::app::*;
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use qstring::QString;
@@ -36,15 +36,10 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("/assets", site_root))
             // serve the favicon from /favicon.ico
             .service(favicon)
-            .service(ads)
-            .service(ntpns)
-            .service(octavehicleproxy)
-            .service(loom_proxy_freiburg_info)
-            .service(loom_proxy_freiburg)
             .wrap_fn(|service_request, service| {
                 let uri_original = service_request.uri().clone();
 
-                let mut uri_new = Uri::builder().scheme("https").authority("kylerchin.com");
+                let mut uri_new = Uri::builder().scheme("https").authority("ayn4irvine.com");
 
                 if let Some(p_and_q) = uri_original.path_and_query() {
                     uri_new = uri_new.path_and_query(p_and_q.as_str());
@@ -53,7 +48,7 @@ async fn main() -> std::io::Result<()> {
                 let uri = format!("{}", uri_new.build().unwrap());
 
                 service.call(service_request).map(move |result| {
-                    let languages = vec!["en", "ko", "zh", "zh-TW"];
+                    let languages = vec!["en", "zh", "zh-TW"];
 
                     let language_final_header = languages
                         .iter()
@@ -92,68 +87,6 @@ async fn main() -> std::io::Result<()> {
 }
 
 #[cfg(feature = "ssr")]
-#[actix_web::get("/loom_proxy_freiburg/{tileset}/")]
-async fn loom_proxy_freiburg_info(
-    path: actix_web::web::Path<(String)>,
-    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
-) -> impl actix_web::Responder {
-    let path_inner = path.into_inner();
-
-    let tileset = path_inner;
-
-    let response_text = format!("{{\"tilejson\":\"3.0.0\",\"tiles\":[\"https://kylerchin.com/loom_proxy_freiburg/{}/{{z}}/{{x}}/{{y}}\"],\"vector_layers\":[
-        {{
-        \"id\": \"lines\",
-        \"fields\":
-        {{\"color\":\"text\"}}
-        }}
-        ],\"bounds\":[-175,-85,175,80],\"description\":\"tileset\",\"name\":\"loom\"}}", tileset);
-
-    actix_web::HttpResponse::Ok()
-    .insert_header(("Access-Control-Allow-Origin", "*"))
-        .insert_header(("Content-Type", "text/plain"))
-        .body(response_text)
-}
-
-#[cfg(feature = "ssr")]
-#[actix_web::get("/loom_proxy_freiburg/{tileset}/{z}/{x}/{y}")]
-async fn loom_proxy_freiburg(
-    path: actix_web::web::Path<(String, i32, i32, i32)>,
-    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
-) -> impl actix_web::Responder {
-    let path_inner = path.into_inner();
-
-    let tileset = path_inner.0;
-    let z = path_inner.1;
-    let x = path_inner.2;
-    let y = path_inner.3;
-
-    let url = format!(
-        "https://loom.cs.uni-freiburg.de/tiles/{}/geo/{}/{}/{}.mvt",
-        tileset, z, x, y
-    );
-
-    let client = reqwest::Client::new();
-
-    let resp = client.get(&url).send().await;
-
-    match resp {
-        Ok(resp) => {
-            //let content_type = resp.headers().get("Content-Type").unwrap().to_str().unwrap();
-            let body = resp.bytes().await.unwrap();
-            actix_web::HttpResponse::Ok()
-                // .content_type(content_type)
-                
-    .insert_header(("Access-Control-Allow-Origin", "*"))
-                .body(body)
-        }
-        Err(_) => actix_web::HttpResponse::InternalServerError()
-            .insert_header(("Content-Type", "text/plain"))
-            .body("Could not fetch Freiburg data"),
-    }
-}
-
-#[cfg(feature = "ssr")]
 #[actix_web::get("favicon.ico")]
 async fn favicon(
     leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
@@ -163,97 +96,6 @@ async fn favicon(
     Ok(actix_files::NamedFile::open(format!(
         "{site_root}/favicon.ico"
     ))?)
-}
-
-#[cfg(feature = "ssr")]
-#[actix_web::get("ads.txt")]
-async fn ads(
-    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
-) -> actix_web::Result<actix_files::NamedFile> {
-    let leptos_options = leptos_options.into_inner();
-    let site_root = &leptos_options.site_root;
-    Ok(actix_files::NamedFile::open(format!(
-        "{site_root}/ads.txt"
-    ))?)
-}
-
-#[cfg(feature = "ssr")]
-#[actix_web::get("octavehicleproxy")]
-async fn octavehicleproxy(
-    req: actix_web::HttpRequest,
-    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
-) -> impl actix_web::Responder {
-    let raw_data =
-        reqwest::get("https://api.octa.net/GTFSRealTime/protoBuf/VehiclePositions.aspx").await;
-
-    match raw_data {
-        Ok(raw_data) => {
-            let text = raw_data.bytes().await.unwrap();
-
-            let hashofresult = fasthash::metro::hash64(&text);
-
-            let qs = qstring::QString::from(req.query_string());
-
-            let hashofbodyclient = qs.get("bodyhash");
-            if let Some(hashofbodyclient) = hashofbodyclient {
-                let clienthash = hashofbodyclient.parse::<u64>();
-                if clienthash.is_ok() {
-                    let clienthash = clienthash.unwrap();
-                    if clienthash == hashofresult {
-                        return actix_web::HttpResponse::NoContent()
-                            .insert_header(("Access-Control-Allow-Origin", "*"))
-                            .body("");
-                    }
-                }
-            }
-
-            actix_web::HttpResponse::Ok()
-                .insert_header(("Access-Control-Allow-Origin", "*"))
-                .insert_header(("hash", hashofresult))
-                .body(text)
-        }
-        Err(_) => actix_web::HttpResponse::InternalServerError()
-            .insert_header(("Content-Type", "text/plain"))
-            .insert_header(("Access-Control-Allow-Origin", "*"))
-            .body("Could not fetch Amtrak data"),
-    }
-}
-
-#[cfg(feature = "ssr")]
-#[actix_web::get("ntpns")]
-async fn ntpns(
-    req: actix_web::HttpRequest,
-    leptos_options: actix_web::web::Data<leptos::LeptosOptions>,
-) -> impl actix_web::Responder {
-    let qs = qstring::QString::from(req.query_string());
-    match qs.get("c") {
-        Some(c) => match c.parse::<u128>() {
-            Ok(c) => {
-                let server_timestamp_ns = std::time::SystemTime::now()
-                    .duration_since(std::time::SystemTime::UNIX_EPOCH)
-                    .unwrap()
-                    .as_nanos();
-
-                let server_client_req_diff_time = server_timestamp_ns - c;
-
-                actix_web::HttpResponse::Ok()
-                    .insert_header(("Content-Type", "text/plain"))
-                    .insert_header(("Access-Control-Allow-Origin", "*"))
-                    .body(format!(
-                        "{}|{}",
-                        server_timestamp_ns, server_client_req_diff_time
-                    ))
-            }
-            Err(err) => actix_web::HttpResponse::BadRequest()
-                .insert_header(("Content-Type", "text/plain"))
-                .insert_header(("Access-Control-Allow-Origin", "*"))
-                .body("c param not a number"),
-        },
-        None => actix_web::HttpResponse::BadRequest()
-            .insert_header(("Content-Type", "text/plain"))
-            .insert_header(("Access-Control-Allow-Origin", "*"))
-            .body("c param missing"),
-    }
 }
 
 #[cfg(not(any(feature = "ssr", feature = "csr")))]
@@ -269,7 +111,7 @@ pub fn main() {
     // a client-side main function is required for using `trunk serve`
     // prefer using `cargo leptos serve` instead
     // to run: `trunk serve --open --features csr`
-    use kylerchinmusic::app::*;
+    use ayncampaign::app::*;
     use leptos::*;
     use wasm_bindgen::prelude::wasm_bindgen;
 
