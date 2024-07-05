@@ -19,7 +19,7 @@ gtag('config', 'G-N17QFSGLLK');"
     </Script>
             // injects a stylesheet into the document <head>
             // id=leptos means cargo-leptos will hot-reload this stylesheet
-            <Stylesheet id="leptos" href="/pkg/kylerchinmusic.css"/>
+            <Stylesheet id="leptos" href="/pkg/ayncampaign.css"/>
             <Stylesheet href="https://use.typekit.net/ffc3xaq.css"/>
 
             <Script async_="true">
