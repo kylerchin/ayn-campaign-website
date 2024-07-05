@@ -9,13 +9,13 @@ pub fn App() -> impl IntoView {
 
     view! {
            // <!-- Google tag (gtag.js) -->
-    <Script async_="true" src="https://www.googletagmanager.com/gtag/js?id=G-NJ3G60BR1Z"/>
+    <Script async_="true" src="https://www.googletagmanager.com/gtag/js?id=G-N17QFSGLLK"/>
     <Script>
 "window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
-gtag('config', 'G-NJ3G60BR1Z');"
+gtag('config', 'G-N17QFSGLLK');"
     </Script>
             // injects a stylesheet into the document <head>
             // id=leptos means cargo-leptos will hot-reload this stylesheet
